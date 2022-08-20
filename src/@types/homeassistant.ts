@@ -16,6 +16,17 @@ export enum AvailabilityMode {
 }
 
 /**
+ * Different sensor types
+ */
+export enum SensorType {
+  sensor = 'sensor',
+  binary_sensor = 'binary_sensor',
+  cover = 'cover',
+  media_player = 'media_player',
+  switch = 'switch'
+}
+
+/**
  * Only available for binary sensors
  */
 export enum DeviceClass_BinarySensor {
@@ -136,7 +147,7 @@ export enum DeviceClass_BinarySensor {
 /**
  * Only available for range based sensors
  */
-const enum DeviceClass_Sensor {
+export enum DeviceClass_Sensor {
   /**
    * Apparent power in VA.
    */
@@ -499,7 +510,7 @@ export interface IMQTTSensor {
    *
    * @default true
    */
-  enabled_by_Default?: boolean;
+  enabled_by_default?: boolean;
 
   /**
    * The encoding of the payloads received. Set to "" to disable decoding of incoming payload.
@@ -540,7 +551,7 @@ export interface IMQTTSensor {
    * to extract the last_reset. Available variables: entity_id. The entity_id can be used to  reference the entity’s
    * attributes.
    */
-  json_attributes_temnplate?: string;
+  json_attributes_template?: string;
 
   /**
    * The MQTT topic subscribed to receive a JSON dictionary payload and then set as sensor attributes. Implies
@@ -553,7 +564,7 @@ export interface IMQTTSensor {
    * to extract the last_reset. Available variables: entity_id. The entity_id can be used to reference the entity’s
    * attributes.
    */
-  last_Reset_value_template?: string;
+  last_reset_value_template?: string;
 
   /**
    * The name of the MQTT sensor.
@@ -572,7 +583,7 @@ export interface IMQTTSensor {
    *
    * @default online
    */
-  paylouad_available?: Availability;
+  payload_available?: Availability;
 
   /**
    * The payload that represents the unavailable state.
@@ -616,4 +627,11 @@ export interface IMQTTSensor {
    * attributes. If the template throws an error, the current state will be used instead.
    */
   value_template?: string;
+}
+
+/**
+ * When sending a state payload, this is the structure that should be followed.
+ */
+export interface IStatePayload {
+  [key: string]: Date | number | string;
 }

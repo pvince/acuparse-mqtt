@@ -71,21 +71,11 @@ export interface IAcuriteTowerData extends IAcuriteBaseData {
  * Fancy indoor sensor, 'ProIn' with water sensor installed. There are at least two other sensor probes that were sold
  * but since I don't have them I cannot identify them.
  */
-export interface IAcuriteProInData extends IAcuriteBaseData  {
+export interface IAcuriteProInData extends Omit<IAcuriteTowerData, 'mt'>   {
   /**
    * Type discriminator
    */
   mt: IAcuriteTowerType.ProIn;
-
-  /**
-   * Humidity percentage. Assumed range 0-100
-   */
-  indoorhumidity: number;
-
-  /**
-   * Temperature in Fahrenheit, ex: 72.8
-   */
-  indoortempf: number;
 
   /**
    * Type of probe installed
@@ -149,6 +139,12 @@ export interface IAcurite5in1x38Data extends Omit<IAcuriteTowerData, 'mt'> {
    */
   windspeedmph: number;
 }
+
+/**
+ * Union of the various data types that supply temperature & humidity data.
+ */
+export type IAcuriteDataWithTemperature = IAcurite5in1x38Data | IAcuriteProInData | IAcuriteTowerData;
+
 /**
  * Union of the various data types we can expect to receive from Acuparse.
  */

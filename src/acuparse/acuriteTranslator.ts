@@ -72,8 +72,8 @@ export function translateProIn(inData: IAcuriteProInQuery): IAcuriteProInData {
   return {
     ...baseData,
     mt: inData.mt,
-    indoortempf: Number(inData.indoortempf),
-    indoorhumidity: Number(inData.indoorhumidity),
+    tempf: Number(inData.indoortempf),
+    humidity: Number(inData.indoorhumidity),
     probe: inData.probe,
     check: _convertBool(inData.check),
     water: _convertBool(inData.water)
