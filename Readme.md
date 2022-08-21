@@ -1,7 +1,7 @@
 # TODO
-* Translate to better JSON (strings to numbers, dateutc to date last updated)
-* Setup a reporting loop that triggers every minute. Aggregate data to publish.
 * Pull down tower names from Acuparse API, map them to received tower IDs
+  * This needs to happen on a schedule (every 5 minutes?) so that changes in Acuparse are reflected here.
+* Add a setup guide
 
 
 # Converting to HomeAssistant discovery
@@ -20,3 +20,10 @@ All from tower
 ## 5-in-1 (temperature)
 All from tower
 - Windspeed
+
+## 5-in-1 (wind)
+- Temperature
+- Humidity
+- Battery
+- Signal
+- timestamp
