@@ -28,12 +28,12 @@ export class SensorValueSignal extends SensorValue {
    */
   public override populateConfiguration(baseConfig: IMQTTSensor): void {
     baseConfig.device_class = DeviceClass_Sensor.signal_strength;
-    baseConfig.device = {
-      model: this.acuriteData.mt,
-      manufacturer: 'Acurite',
-      via_device: 'acuparse-mqtt'
-    };
-    baseConfig.unique_id = this.getUniqueID();
+    baseConfig.name = 'Signal';
+
+    if (!baseConfig.device) {
+      baseConfig.device = {};
+    }
+    baseConfig.device.model = this.acuriteData.mt;
   }
 
   /**

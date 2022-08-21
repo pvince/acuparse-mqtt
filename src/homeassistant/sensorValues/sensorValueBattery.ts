@@ -1,6 +1,7 @@
 import { SensorValue } from './sensorValues';
 import { IAcuriteData } from '../../acuparse/acurite.types';
 import { DeviceClass_Sensor, IMQTTSensor, IStatePayload } from '../../@types/homeassistant';
+import { IAcuriteBatteryLevel } from '../../@types/acurite';
 
 /**
  * Implements a sensor value for a humidity sensor.
@@ -27,12 +28,12 @@ export class SensorValueBattery extends SensorValue {
    */
   public override populateConfiguration(baseConfig: IMQTTSensor): void {
     baseConfig.device_class = DeviceClass_Sensor.battery;
-    baseConfig.device = {
-      model: this.acuriteData.mt,
-      manufacturer: 'Acurite',
-      via_device: 'acuparse-mqtt'
-    };
-    baseConfig.unique_id = this.getUniqueID();
+    if (!baseConfig.device) {
+      baseConfig.device = {};
+    }
+    baseConfig.device.model = this.acuriteData.mt;
+    baseConfig.name = 'Battery';
+    baseConfig.unit_of_measurement = '%';
   }
 
   /**
@@ -46,7 +47,21 @@ export class SensorValueBattery extends SensorValue {
    * @inheritDoc
    */
   public override populateSensorState(inState: IStatePayload): void {
-    inState[this.getSensorStateName()] = this.acuriteData.battery;
+    let batteryLevel: number;
+
+    const batteryNormal = 100;
+    const batteryLow = 10;
+
+    switch (this.acuriteData.battery) {
+      case IAcuriteBatteryLevel.normal:
+        batteryLevel = batteryNormal;
+        break;
+      case IAcuriteBatteryLevel.low:
+        batteryLevel = batteryLow;
+        break;
+    }
+
+    inState[this.getSensorStateName()] = batteryLevel;
   }
 
   /**

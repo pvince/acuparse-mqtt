@@ -29,13 +29,13 @@ export class SensorValueRainDaily extends SensorValue {
     // TODO: Determine if there is a relevant dataclass?
     //baseConfig.device_class = DeviceClass_Sensor.temperature;
     baseConfig.state_class = StateClass.total;
-    baseConfig.device = {
-      model: this.towerData.mt,
-      manufacturer: 'Acurite',
-      via_device: 'acuparse-mqtt'
-    };
-    baseConfig.unique_id = this.getUniqueID();
     baseConfig.unit_of_measurement = 'in';
+    baseConfig.name = 'Rain Today';
+
+    if (!baseConfig.device) {
+      baseConfig.device = {};
+    }
+    baseConfig.device.model = this.towerData.mt;
   }
 
   /**

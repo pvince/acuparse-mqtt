@@ -2,7 +2,7 @@ import { SensorValue } from '../sensorValues/sensorValues';
 import { IMQTTSensor, IStatePayload } from '../../@types/homeassistant';
 
 const TOPIC_PREFIX = 'homeassistant';
-const getSensorTopicRoot = (sensorID: string, sensorValue: SensorValue): string => (`${TOPIC_PREFIX}/${sensorValue.getSensorType()}/${sensorID}}`);
+const getSensorTopicRoot = (sensorID: string, sensorValue: SensorValue): string => (`${TOPIC_PREFIX}/${sensorValue.getSensorType()}/${sensorID}`);
 const getSensorTopicConfig = (sensorID: string, sensorValue:  SensorValue): string => (`${getSensorTopicRoot(sensorID, sensorValue)}/${sensorValue.getConfigurationTopicName()}/config`);
 const getSensorTopicState = (sensorID: string, sensorValue: SensorValue): string => (`${getSensorTopicRoot(sensorID, sensorValue)}/state`);
 
@@ -36,7 +36,15 @@ export abstract class MultiValueSensor {
 
       // Build the basic MQTT Sensor & populate it.
       const mqttSensor:  IMQTTSensor = {
-        state_topic: stateTopic
+        state_topic: stateTopic,
+        value_template: `{{ value_json.${sensorValue.getSensorStateName()} }}`,
+        device: {
+          manufacturer: 'Acurite',
+          via_device: 'acuparse-mqtt',
+          identifiers: [ this.getSensorID() ],
+          name: this.getSensorID()
+        },
+        unique_id: sensorValue.getUniqueID()
       };
       sensorValue.populateConfiguration(mqttSensor);
 

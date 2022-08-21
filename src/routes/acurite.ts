@@ -3,8 +3,8 @@ import asyncHandler from 'express-async-handler';
 import debug from 'debug';
 import { IAcuriteTowerQuery } from '../@types/acurite';
 import { translate } from '../acuparse/acuriteTranslator';
-import { publish } from '../mqtt/mqttComms';
 import { OK } from 'http-status';
+import dataReportingService from '../services/dataReportingService';
 
 const router = express.Router();
 
@@ -25,8 +25,7 @@ async function handleAcuriteRequest(req: Request, res: Response): Promise<void> 
 
     const towerData = translate(towerQuery);
 
-    const publishPath = `acuparse-mqtt/${towerData.sensor}_${towerData.mt}`;
-    await publish(publishPath, towerData);
+    dataReportingService.addSensorReading(towerData);
   }
 
   // Reply w/ a 200 - OK

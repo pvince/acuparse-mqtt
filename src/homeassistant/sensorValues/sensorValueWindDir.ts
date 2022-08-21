@@ -28,13 +28,13 @@ export class SensorValueWindDir extends SensorValue {
   public override populateConfiguration(baseConfig: IMQTTSensor): void {
     // TODO: Determine if there is a relevant dataclass?
     //baseConfig.device_class = DeviceClass_Sensor.temperature;
-    baseConfig.device = {
-      model: this.towerData.mt,
-      manufacturer: 'Acurite',
-      via_device: 'acuparse-mqtt'
-    };
-    baseConfig.unique_id = this.getUniqueID();
     baseConfig.unit_of_measurement = 'deg';
+    baseConfig.name = 'Wind Direction';
+
+    if (!baseConfig.device) {
+      baseConfig.device = {};
+    }
+    baseConfig.device.model = this.towerData.mt;
   }
 
   /**

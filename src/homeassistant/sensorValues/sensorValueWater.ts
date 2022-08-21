@@ -27,12 +27,12 @@ export class SensorValueWater extends SensorValue {
    */
   public override populateConfiguration(baseConfig: IMQTTSensor): void {
     baseConfig.device_class = DeviceClass_BinarySensor.moisture;
-    baseConfig.device = {
-      model: this.towerData.mt,
-      manufacturer: 'Acurite',
-      via_device: 'acuparse-mqtt'
-    };
-    baseConfig.unique_id = this.getUniqueID();
+    baseConfig.name = 'Water';
+
+    if (!baseConfig.device) {
+      baseConfig.device = {};
+    }
+    baseConfig.device.model = this.towerData.mt;
   }
 
   /**

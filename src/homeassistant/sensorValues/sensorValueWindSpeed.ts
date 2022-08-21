@@ -28,13 +28,13 @@ export class SensorValueWindSpeed extends SensorValue {
   public override populateConfiguration(baseConfig: IMQTTSensor): void {
     // todo: Determine if there is a relevant dataclass?
     //baseConfig.device_class = DeviceClass_Sensor.temperature;
-    baseConfig.device = {
-      model: this.towerData.mt,
-      manufacturer: 'Acurite',
-      via_device: 'acuparse-mqtt'
-    };
-    baseConfig.unique_id = this.getUniqueID();
     baseConfig.unit_of_measurement = 'mph';
+    baseConfig.name = 'Wind Speed';
+
+    if (!baseConfig.device) {
+      baseConfig.device = {};
+    }
+    baseConfig.device.model = this.towerData.mt;
   }
 
   /**

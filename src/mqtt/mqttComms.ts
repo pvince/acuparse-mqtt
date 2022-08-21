@@ -1,5 +1,6 @@
 import mqtt, { AsyncMqttClient, IClientOptions } from 'async-mqtt';
 import debug from 'debug';
+import { IClientPublishOptions } from 'mqtt';
 
 const log = debug('acuparse-mqtt:mqttComms');
 
@@ -40,7 +41,8 @@ export async function stopClient(): Promise<void> {
  *
  * @param topic - Topic to publish too
  * @param data - Object to JSON-ify & send
+ * @param opts - MQTT options for this publish
  */
-export async function publish(topic: string, data: object): Promise<void> {
-  await client?.publish(topic, JSON.stringify(data), { retain: true });
+export async function publish(topic: string, data: object, opts: IClientPublishOptions = {}): Promise<void> {
+  await client?.publish(topic, JSON.stringify(data), opts);
 }

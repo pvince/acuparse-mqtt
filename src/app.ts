@@ -36,7 +36,6 @@ function startExpress(): void {
 async function startMQTT(): Promise<void> {
   await mqttComms.startClient(MQTT_HOST, { username: MQTT_USER, password: MQTT_PASS });
 }
-
 /**
  * Starts the application.
  */

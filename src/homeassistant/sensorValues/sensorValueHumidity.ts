@@ -27,13 +27,13 @@ export class SensorValueHumidity extends SensorValue {
    */
   public override populateConfiguration(baseConfig: IMQTTSensor): void {
     baseConfig.device_class = DeviceClass_Sensor.humidity;
-    baseConfig.device = {
-      model: this.towerData.mt,
-      manufacturer: 'Acurite',
-      via_device: 'acuparse-mqtt'
-    };
-    baseConfig.unique_id = this.getUniqueID();
     baseConfig.unit_of_measurement = '%';
+    baseConfig.name = 'Humidity';
+
+    if (!baseConfig.device) {
+      baseConfig.device = {};
+    }
+    baseConfig.device.model = this.towerData.mt;
   }
 
   /**
