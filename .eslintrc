@@ -20,6 +20,7 @@
   "rules": {
     // ESlint specific rules
     "no-console": "off",
+    "no-fallthrough": "off",
     "require-jsdoc": [ "error", { "require": { "ClassDeclaration": true, "MethodDefinition": true } } ],
     "valid-jsdoc": ["error", { "requireReturn": false, "requireReturnType": false, "requireParamType": false }],
     "block-scoped-var": [ "error" ],

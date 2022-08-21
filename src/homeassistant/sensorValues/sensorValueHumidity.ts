@@ -1,6 +1,6 @@
 import { SensorValue } from './sensorValues';
 import { IAcuriteDataWithTemperature } from '../../acuparse/acurite.types';
-import { DeviceClass_Sensor, IMQTTSensor, IStatePayload } from '../../@types/homeassistant';
+import { DeviceClass_Sensor, IMQTTSensor, ISensorState, SensorType } from '../../@types/homeassistant';
 
 /**
  * Implements a sensor value for a humidity sensor.
@@ -25,10 +25,16 @@ export class SensorValueHumidity extends SensorValue {
   /**
    * @inheritDoc
    */
+  public override getSensorName(): string {
+    return 'Humidity';
+  }
+
+  /**
+   * @inheritDoc
+   */
   public override populateConfiguration(baseConfig: IMQTTSensor): void {
     baseConfig.device_class = DeviceClass_Sensor.humidity;
     baseConfig.unit_of_measurement = '%';
-    baseConfig.name = 'Humidity';
 
     if (!baseConfig.device) {
       baseConfig.device = {};
@@ -46,8 +52,10 @@ export class SensorValueHumidity extends SensorValue {
   /**
    * @inheritDoc
    */
-  public override populateSensorState(inState: IStatePayload): void {
-    inState[this.getSensorStateName()] = this.towerData.humidity;
+  public override populateSensorData(inState: ISensorState): void {
+    if (inState.sensorType === SensorType.sensor) {
+      inState.payload[this.getSensorStateName()] = this.towerData.humidity;
+    }
   }
 
   /**

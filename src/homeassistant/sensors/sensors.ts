@@ -1,5 +1,5 @@
-import { SensorValue } from '../sensorValues/sensorValues';
-import { IMQTTSensor, IStatePayload } from '../../@types/homeassistant';
+import { initializeSensorState, SensorValue } from '../sensorValues/sensorValues';
+import { IMQTTSensor, ISensorState } from '../../@types/homeassistant';
 
 const TOPIC_PREFIX = 'homeassistant';
 const getSensorTopicRoot = (sensorID: string, sensorValue: SensorValue): string => (`${TOPIC_PREFIX}/${sensorValue.getSensorType()}/${sensorID}`);
@@ -44,7 +44,9 @@ export abstract class MultiValueSensor {
           identifiers: [ this.getSensorID() ],
           name: this.getSensorID()
         },
-        unique_id: sensorValue.getUniqueID()
+        name: sensorValue.getSensorName(),
+        unique_id: sensorValue.getUniqueID(),
+        object_id: `${this.getSensorID()} ${sensorValue.getSensorName()}`
       };
       sensorValue.populateConfiguration(mqttSensor);
 
@@ -59,15 +61,15 @@ export abstract class MultiValueSensor {
    *
    * @returns - Both the MQTT state topic & the state payload
    */
-  public getState(): Map<string, IStatePayload> {
-    const result = new Map<string, IStatePayload>();
+  public getState(): Map<string, ISensorState> {
+    const result = new Map<string, ISensorState>();
 
     for (const sensorValue of this.sensorValues.values()) {
       const stateTopic = getSensorTopicState(this.getSensorID(), sensorValue);
 
       let statePayload = result.get(stateTopic);
       if (!statePayload) {
-        statePayload = {};
+        statePayload = initializeSensorState(sensorValue);
         result.set(stateTopic, statePayload);
       }
 

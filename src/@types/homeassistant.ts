@@ -27,6 +27,14 @@ export enum SensorType {
 }
 
 /**
+ * Binary sensor states.
+ */
+export enum BinarySensorState {
+  on = 'on',
+  off = 'off'
+}
+
+/**
  * Only available for binary sensors
  */
 export enum DeviceClass_BinarySensor {
@@ -630,8 +638,38 @@ export interface IMQTTSensor {
 }
 
 /**
- * When sending a state payload, this is the structure that should be followed.
+ * MQTT Sensor state object for a standard sensor.
  */
-export interface IStatePayload {
-  [key: string]: Date | boolean | number | string;
+export interface ISensorState_Sensor {
+  /**
+   * Type discriminator
+   */
+  sensorType: SensorType.sensor;
+
+  /**
+   * Payload data
+   */
+  payload: {
+    [key: string]: Date | boolean | number | string;
+  };
 }
+
+/**
+ * MQTT Sensor state object for a standard sensor.
+ */
+export interface ISensorState_BinarySensor {
+  /**
+   * Type discriminator
+   */
+  sensorType: SensorType.binary_sensor;
+
+  /**
+   * Payload data
+   */
+  payload: BinarySensorState;
+}
+
+/**
+ * Sensor state type union.
+ */
+export type ISensorState = ISensorState_BinarySensor | ISensorState_Sensor;

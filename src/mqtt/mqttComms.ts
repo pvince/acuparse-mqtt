@@ -43,7 +43,7 @@ export async function stopClient(): Promise<void> {
  * @param data - Object to JSON-ify & send
  * @param opts - MQTT options for this publish
  */
-export async function publish(topic: string, data: object, opts: IClientPublishOptions = {}): Promise<void> {
+export async function publish(topic: string, data: object | string, opts: IClientPublishOptions = {}): Promise<void> {
   await client?.publish(topic, JSON.stringify(data), opts);
 }
 

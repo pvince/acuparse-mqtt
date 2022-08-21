@@ -46,7 +46,8 @@ class DataReportingService {
     // Save the sensor value
     const sensor = createSensor(acuriteData);
 
-    //todo: Revisit this, it is a dirty hack.
+    //todo: Revisit this. We aren't currently waiting for the config to be published. This _shouldn't_ be a problem
+    //      because the first actual data report happens ~1 minute later when the job triggers.
     this.publishSensorConfig(sensor)
       .catch((err) => {
         reportingLog('Encountered an error publishing the configuration: %s', err);
@@ -115,7 +116,7 @@ class DataReportingService {
         // Ok... now submit the sensor state info
         const stateMap = sensor.getState();
         for (const [stateTopic, state] of stateMap) {
-          await publish(stateTopic, state);
+          await publish(stateTopic, state.payload);
         }
 
         // Finally, pause this job since we just sent the data.

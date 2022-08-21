@@ -1,5 +1,10 @@
 import { IAcuriteDataWithTemperature } from '../../acuparse/acurite.types';
-import { DeviceClass_Sensor, IMQTTSensor, IStatePayload } from '../../@types/homeassistant';
+import {
+  DeviceClass_Sensor,
+  IMQTTSensor,
+  ISensorState,
+  SensorType
+} from '../../@types/homeassistant';
 import { SensorValue } from './sensorValues';
 
 /**
@@ -25,10 +30,16 @@ export class SensorValueTemperature extends SensorValue {
   /**
    * @inheritDoc
    */
+  public override getSensorName(): string {
+    return 'Temperature';
+  }
+
+  /**
+   * @inheritDoc
+   */
   public override populateConfiguration(baseConfig: IMQTTSensor): void {
     baseConfig.device_class = DeviceClass_Sensor.temperature;
     baseConfig.unit_of_measurement = 'F';
-    baseConfig.name = 'Temperature';
 
     if (!baseConfig.device) {
       baseConfig.device = {};
@@ -46,8 +57,10 @@ export class SensorValueTemperature extends SensorValue {
   /**
    * @inheritDoc
    */
-  public override populateSensorState(inState: IStatePayload): void {
-    inState[this.getSensorStateName()] = this.towerData.tempf;
+  public override populateSensorData(inState: ISensorState): void {
+    if (inState.sensorType === SensorType.sensor) {
+      inState.payload[this.getSensorStateName()] = this.towerData.tempf;
+    }
   }
 
   /**

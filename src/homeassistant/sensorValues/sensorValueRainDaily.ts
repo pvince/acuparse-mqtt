@@ -1,5 +1,5 @@
 import { IAcurite5in1x31Data } from '../../acuparse/acurite.types';
-import { IMQTTSensor, IStatePayload, StateClass } from '../../@types/homeassistant';
+import { IMQTTSensor, ISensorState, SensorType, StateClass } from '../../@types/homeassistant';
 import { SensorValue } from './sensorValues';
 
 /**
@@ -25,12 +25,16 @@ export class SensorValueRainDaily extends SensorValue {
   /**
    * @inheritDoc
    */
+  public override getSensorName(): string {
+    return 'Rain Today';
+  }
+
+  /**
+   * @inheritDoc
+   */
   public override populateConfiguration(baseConfig: IMQTTSensor): void {
-    // TODO: Determine if there is a relevant dataclass?
-    //baseConfig.device_class = DeviceClass_Sensor.temperature;
     baseConfig.state_class = StateClass.total;
     baseConfig.unit_of_measurement = 'in';
-    baseConfig.name = 'Rain Today';
 
     if (!baseConfig.device) {
       baseConfig.device = {};
@@ -48,8 +52,10 @@ export class SensorValueRainDaily extends SensorValue {
   /**
    * @inheritDoc
    */
-  public override populateSensorState(inState: IStatePayload): void {
-    inState[this.getSensorStateName()] = this.towerData.dailyrainin;
+  public override populateSensorData(inState: ISensorState): void {
+    if (inState.sensorType === SensorType.sensor) {
+      inState.payload[this.getSensorStateName()] = this.towerData.dailyrainin;
+    }
   }
 
   /**
