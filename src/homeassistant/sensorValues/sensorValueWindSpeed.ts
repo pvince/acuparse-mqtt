@@ -55,6 +55,6 @@ export class SensorValueWindSpeed extends SensorValue {
    * @inheritDoc
    */
   public override getUniqueID(): string {
-    return `${this.towerData.sensor}_Wind`;
+    return `${this.towerData.sensor}_${this.towerData.mt}_Wind`;
   }
 }

@@ -54,6 +54,6 @@ export class SensorValueTimestamp extends SensorValue {
    * @inheritDoc
    */
   public override getUniqueID(): string {
-    return `${this.acuriteData.sensor}_ts`;
+    return `${this.acuriteData.sensor}_${this.acuriteData.mt}_ts`;
   }
 }

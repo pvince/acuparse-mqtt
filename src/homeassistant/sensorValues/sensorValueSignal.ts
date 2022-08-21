@@ -77,6 +77,6 @@ export class SensorValueSignal extends SensorValue {
    * @inheritDoc
    */
   public override getUniqueID(): string {
-    return `${this.acuriteData.sensor}_Signal`;
+    return `${this.acuriteData.sensor}_${this.acuriteData.mt}_Signal`;
   }
 }

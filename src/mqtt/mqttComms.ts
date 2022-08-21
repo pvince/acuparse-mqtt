@@ -46,3 +46,12 @@ export async function stopClient(): Promise<void> {
 export async function publish(topic: string, data: object, opts: IClientPublishOptions = {}): Promise<void> {
   await client?.publish(topic, JSON.stringify(data), opts);
 }
+
+/**
+ * Clear //  delete the specified MQTT topic.
+ *
+ * @param topic - Topic to clear
+ */
+export async function clearTopic(topic: string): Promise<void> {
+  await client?.publish(topic, '', { retain: true });
+}

@@ -2,7 +2,7 @@ import { MultiValueSensor } from '../homeassistant/sensors/sensors';
 import { IAcuriteData } from '../acuparse/acurite.types';
 import { createSensor } from '../homeassistant/sensors';
 import { AsyncTask, JobStatus, SimpleIntervalJob } from 'toad-scheduler';
-import { publish } from '../mqtt/mqttComms';
+import { clearTopic, publish } from '../mqtt/mqttComms';
 import { getScheduler } from './jobScheduler';
 import debug from 'debug';
 
@@ -45,15 +45,55 @@ class DataReportingService {
   public addSensorReading(acuriteData: IAcuriteData): void {
     // Save the sensor value
     const sensor = createSensor(acuriteData);
-    if (!this.dataStore.has(sensor.getSensorID())) {
-      reportingLog('Adding %s to data reporting service', sensor.getSensorID());
-    }
+
+    //todo: Revisit this, it is a dirty hack.
+    this.publishSensorConfig(sensor)
+      .catch((err) => {
+        reportingLog('Encountered an error publishing the configuration: %s', err);
+      });
 
     this.dataStore.set(sensor.getSensorID(), sensor);
 
-
     // Ensure the job is running.
     this.startJob(sensor.getSensorID());
+  }
+
+  /**
+   * Checks if this data reporting service has previously encountered this sensor.
+   *
+   * @param sensorID - ID of the sensor to check
+   * @returns - True if the sensor has been encountered.
+   */
+  public hasEncounteredSensor(sensorID: string): boolean {
+    return this.dataStore.has(sensorID) || this.jobStore.has(sensorID);
+  }
+
+  /**
+   * Centralized reporting of the sensor's configuration.
+   *
+   * @param sensor - Sensor to submit configuration information for.
+   * @protected
+   */
+  protected async publishSensorConfig(sensor: MultiValueSensor): Promise<void> {
+    const configLog = reportingLog.extend('sensorConfig');
+    const sensorID = sensor.getSensorID();
+
+    // Check if we need to send the sensor configs
+    if (!this.sentConfigs.has(sensorID)) {
+      configLog('Publishing config data for %s', sensorID);
+
+      const sensorConfig = sensor.getConfiguration();
+      for (const [configTopic, config] of sensorConfig) {
+        // Ensure we delete any pre-existing topics related to this.
+        await clearTopic(configTopic);
+
+        // Publish the new configuration.
+        await publish(configTopic, config, { retain: true });
+      }
+
+      // Ensure we don't do this again for this runtime.
+      this.sentConfigs.add(sensorID);
+    }
   }
 
   /**
@@ -70,18 +110,6 @@ class DataReportingService {
         submitLog('Finished reporting for sensor ID %s, stopping the job', sensorID);
         this.jobStore.get(sensorID)?.stop();
       } else {
-        // Check if we need to send the sensor configs
-        if (!this.sentConfigs.has(sensorID)) {
-          submitLog('Publishing config data for %s', sensorID);
-
-          const sensorConfig = sensor.getConfiguration();
-          for (const [configTopic, config] of sensorConfig) {
-            await publish(configTopic, config, { retain: true });
-          }
-
-          // Ensure we don't do this again for this runtime.
-          this.sentConfigs.add(sensorID);
-        }
 
         submitLog('Publishing state data for %s', sensorID);
         // Ok... now submit the sensor state info
