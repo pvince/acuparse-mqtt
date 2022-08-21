@@ -633,5 +633,5 @@ export interface IMQTTSensor {
  * When sending a state payload, this is the structure that should be followed.
  */
 export interface IStatePayload {
-  [key: string]: Date | number | string;
+  [key: string]: Date | boolean | number | string;
 }

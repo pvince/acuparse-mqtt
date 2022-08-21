@@ -46,7 +46,7 @@ export class SensorValueWater extends SensorValue {
    * @inheritDoc
    */
   public override populateSensorState(inState: IStatePayload): void {
-    inState[this.getSensorStateName()] = this.towerData.tempf;
+    inState[this.getSensorStateName()] = this.towerData.water;
   }
 
   /**

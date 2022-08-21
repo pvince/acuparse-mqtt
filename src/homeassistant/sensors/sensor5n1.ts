@@ -6,6 +6,8 @@ import { SensorValueTimestamp } from '../sensorValues/sensorValueTimestamp';
 import { SensorValueWindDir } from '../sensorValues/sensorValueWindDir';
 import { SensorValueRainCur } from '../sensorValues/sensorValueRainCur';
 import { SensorValueRainDaily } from '../sensorValues/sensorValueRainDaily';
+import { SensorValueBattery } from '../sensorValues/sensorValueBattery';
+import { SensorValueSignal } from '../sensorValues/sensorValueSignal';
 
 /**
  * A Home Assistant sensor definition for an Acurite '5m1x38' sensor.
@@ -47,6 +49,8 @@ export class Sensor5n1x31 extends MultiValueSensor {
     this.addSensorValue(new SensorValueRainCur(this.towerData));
     this.addSensorValue(new SensorValueRainDaily(this.towerData));
     this.addSensorValue(new SensorValueTimestamp(this.towerData));
+    this.addSensorValue(new SensorValueBattery(this.towerData));
+    this.addSensorValue(new SensorValueSignal(this.towerData));
   }
 
   /**
