@@ -91,7 +91,7 @@ class DataReportingService {
         }
 
         // Finally, pause this job since we just sent the data.
-        this.jobStore.delete(sensorID);
+        this.dataStore.delete(sensorID);
       }
     } catch (err) {
       submitLog('Encountered an error publishing for %s: %s', sensorID, err);
