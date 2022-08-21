@@ -1,17 +1,17 @@
-import { IAcuriteDataWithWind } from '../../acuparse/acurite.types';
+import { IAcurite5in1x31Data } from '../../acuparse/acurite.types';
 import { IMQTTSensor, IStatePayload } from '../../@types/homeassistant';
 import { SensorValue } from './sensorValues';
 
 /**
  * Implements a sensor value for a temperature sensor.
  */
-export class SensorValueWindSpeed extends SensorValue {
+export class SensorValueRainCur extends SensorValue {
   /**
    * constructor
    *
    * @param towerData - Tower data
    */
-  public constructor(private readonly towerData: IAcuriteDataWithWind) {
+  public constructor(private readonly towerData: IAcurite5in1x31Data) {
     super();
   }
 
@@ -26,7 +26,7 @@ export class SensorValueWindSpeed extends SensorValue {
    * @inheritDoc
    */
   public override populateConfiguration(baseConfig: IMQTTSensor): void {
-    // todo: Determine if there is a relevant dataclass?
+    // TODO: Determine if there is a relevant dataclass?
     //baseConfig.device_class = DeviceClass_Sensor.temperature;
     baseConfig.device = {
       model: this.towerData.mt,
@@ -34,27 +34,27 @@ export class SensorValueWindSpeed extends SensorValue {
       via_device: 'acuparse-mqtt'
     };
     baseConfig.unique_id = this.getUniqueID();
-    baseConfig.unit_of_measurement = 'mph';
+    baseConfig.unit_of_measurement = 'in';
   }
 
   /**
    * @inheritDoc
    */
   public override getSensorStateName(): string {
-    return 'windmph';
+    return 'rain';
   }
 
   /**
    * @inheritDoc
    */
   public override populateSensorState(inState: IStatePayload): void {
-    inState[this.getSensorStateName()] = this.towerData.windspeedmph;
+    inState[this.getSensorStateName()] = this.towerData.rainin;
   }
 
   /**
    * @inheritDoc
    */
   public override getUniqueID(): string {
-    return `${this.towerData.sensor}_Wind`;
+    return `${this.towerData.sensor}_Rain`;
   }
 }

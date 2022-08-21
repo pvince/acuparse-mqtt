@@ -146,6 +146,11 @@ export interface IAcurite5in1x38Data extends Omit<IAcuriteTowerData, 'mt'> {
 export type IAcuriteDataWithTemperature = IAcurite5in1x38Data | IAcuriteProInData | IAcuriteTowerData;
 
 /**
+ * Union of the various data types that supply wind speed information.
+ */
+export type IAcuriteDataWithWind = IAcurite5in1x31Data | IAcurite5in1x38Data;
+
+/**
  * Union of the various data types we can expect to receive from Acuparse.
  */
 export type IAcuriteData = IAcurite5in1x31Data | IAcurite5in1x38Data | IAcuriteProInData | IAcuriteTowerData;
