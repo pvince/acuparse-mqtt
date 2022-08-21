@@ -53,7 +53,7 @@ export class SensorValueWater extends SensorValue {
    * @inheritDoc
    */
   public override getUniqueID(): string {
-    return `${this.towerData.sensor}_Temp`;
+    return `${this.towerData.sensor}_Water`;
   }
 
   /**
