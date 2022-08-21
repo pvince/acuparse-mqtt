@@ -67,7 +67,8 @@ class DataReportingService {
     try {
       const sensor = this.dataStore.get(sensorID);
       if (!sensor) {
-        submitLog('No sensor found with ID %s', sensorID);
+        submitLog('Finished reporting for sensor ID %s, stopping the job', sensorID);
+        this.jobStore.get(sensorID)?.stop();
       } else {
         // Check if we need to send the sensor configs
         if (!this.sentConfigs.has(sensorID)) {
@@ -89,12 +90,8 @@ class DataReportingService {
           await publish(stateTopic, state);
         }
 
-        // todo: This is wrong. We should actually remove this sensor reading from the map, and only 'pause' this
-        //       if the event triggers and there is no data to report. As it stands now, this is no different from a
-        //       basic javascript 'timeout'
-
         // Finally, pause this job since we just sent the data.
-        this.jobStore.get(sensorID)?.stop();
+        this.jobStore.delete(sensorID);
       }
     } catch (err) {
       submitLog('Encountered an error publishing for %s: %s', sensorID, err);
