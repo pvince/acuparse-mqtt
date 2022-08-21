@@ -1,17 +1,17 @@
-import { IAcuriteDataWithTemperature } from '../../acuparse/acurite.types';
+import { IAcuriteProInData } from '../../acuparse/acurite.types';
 import { DeviceClass_BinarySensor, IMQTTSensor, IStatePayload, SensorType } from '../../@types/homeassistant';
 import { SensorValue } from './sensorValues';
 
 /**
  * Implements a sensor value for a temperature sensor.
  */
-export class SensorValueTemperature extends SensorValue {
+export class SensorValueWater extends SensorValue {
   /**
    * constructor
    *
    * @param towerData - Tower data
    */
-  public constructor(private readonly towerData: IAcuriteDataWithTemperature) {
+  public constructor(private readonly towerData: IAcuriteProInData) {
     super();
   }
 

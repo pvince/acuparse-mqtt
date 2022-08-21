@@ -1,20 +1,20 @@
-import { IAcuriteProInData } from '../../acuparse/acurite.types';
+import { IAcurite5in1x38Data } from '../../acuparse/acurite.types';
 import { SensorTower } from './sensorTower';
-import { SensorValueWater } from '../sensorValues/sensorValueWater';
+import { SensorValueWindSpeed } from '../sensorValues/sensorValueWindSpeed';
 
 /**
  * A Home Assistant sensor definition for an Acurite 'tower' sensor.
  */
-export class SensorProIn extends SensorTower {
+export class Sensor5n1x38 extends SensorTower {
   /**
    * Constructor.
    *
    * @param towerData - Acurite // Acuparse tower data.
    */
-  public constructor(towerData: IAcuriteProInData) {
+  public constructor(towerData: IAcurite5in1x38Data) {
     super(towerData);
 
-    this.addSensorValue(new SensorValueWater(towerData));
+    this.addSensorValue(new SensorValueWindSpeed(towerData));
   }
 
   /**

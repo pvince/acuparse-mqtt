@@ -17,4 +17,6 @@ Data to report:
 All from tower
 - water
 
-##
+## 5-in-1 (temperature)
+All from tower
+- Windspeed
