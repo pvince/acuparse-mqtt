@@ -25,7 +25,7 @@ async function handleAcuriteRequest(req: Request, res: Response): Promise<void> 
 
     const towerData = translate(towerQuery);
 
-    dataReportingService.addSensorReading(towerData);
+    await dataReportingService.addSensorReading(towerData);
   }
 
   // Reply w/ a 200 - OK

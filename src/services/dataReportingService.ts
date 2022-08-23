@@ -42,16 +42,12 @@ class DataReportingService {
    *
    * @param acuriteData - Acurite // Acuparse data we have received.
    */
-  public addSensorReading(acuriteData: IAcuriteData): void {
+  public async addSensorReading(acuriteData: IAcuriteData): Promise<void> {
     // Save the sensor value
-    const sensor = createSensor(acuriteData);
+    const sensor = await createSensor(acuriteData);
 
-    //todo: Revisit this. We aren't currently waiting for the config to be published. This _shouldn't_ be a problem
-    //      because the first actual data report happens ~1 minute later when the job triggers.
-    this.publishSensorConfig(sensor)
-      .catch((err) => {
-        reportingLog('Encountered an error publishing the configuration: %s', err);
-      });
+    // Publish the sensor configuration
+    await this.publishSensorConfig(sensor);
 
     this.dataStore.set(sensor.getSensorID(), sensor);
 
@@ -141,10 +137,12 @@ class DataReportingService {
       const task = new AsyncTask(
         `submitStatus[${sensorID}]`,
         taskFunc,
-        (err: Error) => { /*todo: add error handling here */}
+        (err: Error) => {
+          reportingLog('Encountered an error while running submitStatus(%s): %s', sensorID, err);
+        }
       );
 
-      curJob = new SimpleIntervalJob({ minutes: 1 }, task);
+      curJob = new SimpleIntervalJob({ minutes: 1, runImmediately: true }, task);
       this.jobStore.set(sensorID, curJob);
 
       reportingLog('Starting job for sensor: %s', sensorID);

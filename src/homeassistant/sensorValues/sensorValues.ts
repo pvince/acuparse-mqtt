@@ -22,6 +22,7 @@ export function initializeSensorState(sensorValue: SensorValue): ISensorState {
         sensorType: SensorType.binary_sensor,
         payload: BinarySensorState.off
       };
+      break;
     case SensorType.cover:
     case SensorType.media_player:
     case SensorType.switch:

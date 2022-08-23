@@ -1,6 +1,7 @@
 import { IAcuriteProInData } from '../../acuparse/acurite.types';
 import { SensorTower } from './sensorTower';
 import { SensorValueWater } from '../sensorValues/sensorValueWater';
+import { ISensorConfig } from './sensors';
 
 /**
  * A Home Assistant sensor definition for an Acurite 'tower' sensor.
@@ -10,9 +11,10 @@ export class SensorProIn extends SensorTower {
    * Constructor.
    *
    * @param towerData - Acurite // Acuparse tower data.
+   * @param config - Sensor configuration information.
    */
-  public constructor(towerData: IAcuriteProInData) {
-    super(towerData);
+  public constructor(towerData: IAcuriteProInData, config: ISensorConfig) {
+    super(towerData, config);
 
     this.addSensorValue(new SensorValueWater(towerData));
   }

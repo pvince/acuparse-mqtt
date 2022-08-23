@@ -7,10 +7,41 @@ const getSensorTopicConfig = (sensorID: string, sensorValue:  SensorValue): stri
 const getSensorTopicState = (sensorID: string, sensorValue: SensorValue): string => (`${getSensorTopicRoot(sensorID, sensorValue)}/state`);
 
 /**
+ * Sensor configuration
+ */
+export interface ISensorConfig {
+  /**
+   * Name of the sensor (aka device).
+   */
+  sensorName: string;
+}
+
+/**
  * A sensor that has multiple values.
  */
 export abstract class MultiValueSensor {
   protected readonly sensorValues = new Map<string, SensorValue>;
+
+  protected readonly sensorName;
+
+  /**
+   * Constructor
+   *
+   * @param config - Sensor configuration information.
+   * @protected
+   */
+  protected constructor(config: ISensorConfig) {
+    this.sensorName = config.sensorName;
+  }
+
+  /**
+   * Returns the sensor name
+   *
+   * @returns - Sensor name
+   */
+  public getSensorName(): string {
+    return this.sensorName;
+  }
 
   /**
    * Adds a new sensor value definition to this class.
@@ -42,11 +73,11 @@ export abstract class MultiValueSensor {
           manufacturer: 'Acurite',
           via_device: 'acuparse-mqtt',
           identifiers: [ this.getSensorID() ],
-          name: this.getSensorID()
+          name: this.getSensorName()
         },
         name: sensorValue.getSensorName(),
         unique_id: sensorValue.getUniqueID(),
-        object_id: `${this.getSensorID()} ${sensorValue.getSensorName()}`
+        object_id: `${this.getSensorName()} ${sensorValue.getSensorName()}`
       };
       sensorValue.populateConfiguration(mqttSensor);
 
