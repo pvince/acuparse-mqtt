@@ -2,11 +2,23 @@ import { MultiValueSensor } from '../homeassistant/sensors/sensors';
 import { IAcuriteData } from '../acuparse/acurite.types';
 import { createSensor } from '../homeassistant/sensors';
 import { AsyncTask, JobStatus, SimpleIntervalJob } from 'toad-scheduler';
-import { clearTopic, publish } from '../mqtt/mqttComms';
+import { clearTopic, publish, subscribe, unsubscribe } from '../mqtt/mqttComms';
 import { getScheduler } from './jobScheduler';
 import debug from 'debug';
+import { IMQTTSensor } from '../@types/homeassistant';
+import _ from 'lodash';
 
 const reportingLog = debug('acuparse-mqtt:dataReportingService');
+
+/**
+ * Converts 'setTimeout' to a promise based function.
+ *
+ * @param duration - Duration of the sleep in milliseconds.
+ * @returns - Returns a promise that resolves when the duration has passed
+ */
+function sleepPromise(duration: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, duration));
+}
 
 /**
  * Centralized data reporting service. This is responsible for aggregating sensor data, and reporting that
@@ -77,20 +89,81 @@ class DataReportingService {
 
     // Check if we need to send the sensor configs
     if (!this.sentConfigs.has(sensorID)) {
-      configLog('Publishing config data for %s', sensorID);
-
       const sensorConfig = sensor.getConfiguration();
-      for (const [configTopic, config] of sensorConfig) {
-        // Ensure we delete any pre-existing topics related to this.
-        await clearTopic(configTopic);
 
-        // Publish the new configuration.
-        await publish(configTopic, config, { retain: true });
+      // We should only publish a configuration in rare circumstances, ideally never, but during development
+      // it is it is nice to be able to dynamically determine if the sensors configurations have changed.
+      if (!(await this.checkPublishedConfig(sensorConfig))) {
+        configLog('Publishing config data for %s', sensorID);
+
+        for (const [configTopic, config] of sensorConfig) {
+          // Ensure we delete any pre-existing topics related to this.
+          await clearTopic(configTopic);
+
+          // Publish the new configuration.
+          await publish(configTopic, config, { retain: true });
+        }
       }
 
       // Ensure we don't do this again for this runtime.
       this.sentConfigs.add(sensorID);
     }
+  }
+
+  /**
+   * This verifies the current sensor configuration vs. the published sensor configuration.
+   *
+   * @param sensorConfig - Sensor configuration to compare against.
+   * @returns - True if the configurations match, false otherwise.
+   * @protected
+   */
+  protected async checkPublishedConfig(sensorConfig: [string, IMQTTSensor][]): Promise<boolean> {
+    const configLog = reportingLog.extend('sensorConfig:checkPublished');
+
+    const fullConfiguration = sensorConfig;
+
+    // Subscribe to all the configuration topics
+    configLog('Subscribing to configuration topics...');
+    const receivedFullConfiguration = new Map<string, IMQTTSensor>();
+    for (const [topic] of fullConfiguration) {
+      await subscribe(topic, (buffer) => {
+        configLog('Received: %s', topic);
+        const jsonConfig = buffer.toString();
+        const receivedConfig = JSON.parse(jsonConfig);
+        receivedFullConfiguration.set(topic, receivedConfig as IMQTTSensor);
+      });
+    }
+
+    // Give it 500 milliseconds for the topics to send back retained values.
+    const waitIterations = 5;
+    const waitDuration = 100;
+    for (let i = 0; i < waitIterations && receivedFullConfiguration.size !== fullConfiguration.length; ++i) {
+      await sleepPromise(waitDuration);
+    }
+
+    // Ensure we are no longer subscribed to these topics.
+    for (const [topic] of fullConfiguration) {
+      await unsubscribe(topic);
+    }
+
+    // Check if the published configuration == actual configuration.
+    let result = fullConfiguration.length === receivedFullConfiguration.size;
+
+    if (result) {
+      for (const [topic, config] of fullConfiguration) {
+        const publishedConfig = receivedFullConfiguration.get(topic);
+        if (publishedConfig === undefined) {
+          result = false;
+          break;
+        } else if (!_.isEqual(config, publishedConfig)) {
+          result = false;
+          break;
+        }
+      }
+    }
+
+    configLog(`Published ${result ? '==' : '!='} current.`);
+    return result;
   }
 
   /**
