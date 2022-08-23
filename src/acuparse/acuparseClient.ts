@@ -83,10 +83,9 @@ export class AcuparseClient {
     // event loop, it is possible that when we start retrieving the towers a 2nd call could enter the 'update' region.
     // This would leave us with two, simultaneous, attempts to retrieve tower data when we might not want that.
     const release = await this.mutex.acquire();
-
-    let tower: IAcuparseTower | null =  this.cachedTowers?.towers?.[towerID] ?? null;
-    if (tower === null) {
-      try {
+    let tower = this.cachedTowers?.towers?.[towerID] ?? null;
+    try {
+      if (tower === null) {
         logAcuparse('Retrieving tower %s from %s', towerID, this.host);
 
         const response = await this.client.get<IAcuparseTowerResponse>('/api/v1/json/tower',
@@ -100,11 +99,11 @@ export class AcuparseClient {
         tower = this.cachedTowers?.towers?.[towerID] ?? null;
 
         logAcuparse('Retrieved tower %s with name %s', towerID, tower?.name ??  '<unknown>');
-      } catch (err) {
-        logAcuparse('Failed to retrieve towers... %s', err);
-      } finally {
-        release();
       }
+    } catch (err) {
+      logAcuparse('Failed to retrieve towers... %s', err);
+    } finally {
+      release();
     }
 
     return tower;
