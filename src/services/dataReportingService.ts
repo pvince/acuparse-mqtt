@@ -69,16 +69,6 @@ class DataReportingService {
   }
 
   /**
-   * Checks if this data reporting service has previously encountered this sensor.
-   *
-   * @param sensorID - ID of the sensor to check
-   * @returns - True if the sensor has been encountered.
-   */
-  public hasEncounteredSensor(sensorID: string): boolean {
-    return this.dataStore.has(sensorID) || this.jobStore.has(sensorID);
-  }
-
-  /**
    * Centralized reporting of the sensor's configuration.
    *
    * @param sensor - Sensor to submit configuration information for.

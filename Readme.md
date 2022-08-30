@@ -19,3 +19,6 @@
     - SmartHubs don't work w/ the new 'Atlas' sensors
   - [ ] Add a frontend to display current sensor data (Home Assistant?)
   - [ ] Create a way to specify the names of sensors (since Acuparse is used for that now)
+  - [ ] Add a way to ignore sensors? Whitelist vs. blacklist?
+    - Easiest to do a whitelist via a config file, write out all received sensors + last reading to json files?
+    - Publish them to MQTT anyway?
