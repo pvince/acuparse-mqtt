@@ -1,6 +1,7 @@
 import mqtt, { AsyncMqttClient, IClientOptions } from 'async-mqtt';
 import debug from 'debug';
 import { IClientPublishOptions } from 'mqtt';
+import { logMQTTPublish } from '../services/statistics';
 
 /**
  * Callback function invoked when a message is received.
@@ -79,6 +80,7 @@ export async function stopClient(): Promise<void> {
  * @param opts - MQTT options for this publish
  */
 export async function publish(topic: string, data: object | string, opts: IClientPublishOptions = {}): Promise<void> {
+  logMQTTPublish(topic);
   await getClient().publish(topic, JSON.stringify(data), opts);
 }
 

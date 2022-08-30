@@ -7,6 +7,7 @@ import { getScheduler } from './jobScheduler';
 import debug from 'debug';
 import { IMQTTSensor } from '../@types/homeassistant';
 import _ from 'lodash';
+import { logSensorPublish } from './statistics';
 
 const reportingLog = debug('acuparse-mqtt:dataReportingService');
 
@@ -172,8 +173,8 @@ class DataReportingService {
    * @param sensorID - Sensor ID to report
    * @protected
    */
-  protected async submitSensorReport(sensorID: string): Promise<void> {
-    const submitLog = reportingLog.extend('submitSensorReport');
+  protected async publishSensorStates(sensorID: string): Promise<void> {
+    const submitLog = reportingLog.extend('publishSensorStates');
     try {
       const sensor = this.dataStore.get(sensorID);
       if (!sensor) {
@@ -182,6 +183,9 @@ class DataReportingService {
       } else {
 
         submitLog('Publishing state data for %s', sensorID);
+
+        logSensorPublish(sensor);
+
         // Ok... now submit the sensor state info
         const stateMap = sensor.getState();
         for (const [stateTopic, state] of stateMap) {
@@ -205,7 +209,7 @@ class DataReportingService {
   protected startJob(sensorID: string): void {
     let curJob = this.jobStore.get(sensorID);
     if (!curJob) {
-      const taskFunc = (): Promise<void> => (this.submitSensorReport(sensorID));
+      const taskFunc = (): Promise<void> => (this.publishSensorStates(sensorID));
 
       const task = new AsyncTask(
         `submitStatus[${sensorID}]`,

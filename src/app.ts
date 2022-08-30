@@ -4,6 +4,8 @@ import debug from 'debug';
 import * as mqttComms from './mqtt/mqttComms';
 import acuriteRouter from './routes/acurite';
 import { setupAcuparse } from './acuparse/acuparseClient';
+import apiRouter from './routes/api';
+import compression from 'compression';
 
 const appLog = debug('acuparse-mqtt');
 
@@ -19,14 +21,20 @@ function startExpress(): void {
   appLog('Starting web service...');
   const app = express();
 
+  app.use(compression());
   app.use(express.json());
   app.use(acuriteRouter);
+  app.use(apiRouter);
 
+  app.use((req: Request, res: Response, next: NextFunction) => {
+    appLog('Unhandled web request: %s %s', req.method, req.originalUrl);
+    next();
+  });
   app.use((err: unknown, req: Request, res: Response, next: NextFunction) => {
     appLog(JSON.stringify(err));
   });
 
-  const PORT = 3000;
+  const PORT = 80;
   app.listen(PORT, () => {
     appLog('Started listening on port %d', PORT);
   });

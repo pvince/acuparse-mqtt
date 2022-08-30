@@ -5,10 +5,11 @@ import { IAcuriteTowerQuery } from '../@types/acurite';
 import { translate } from '../acuparse/acuriteTranslator';
 import { OK } from 'http-status';
 import dataReportingService from '../services/dataReportingService';
+import { logAcuriteRequest } from '../services/statistics';
 
-const router = express.Router();
+const acuriteRouter = express.Router();
 
-const acuriteLog = debug('acuparse-mqtt:acurite');
+const expressLog = debug('acuparse-mqtt:express');
 
 /**
  * Request handler for Acurite requests.
@@ -17,13 +18,14 @@ const acuriteLog = debug('acuparse-mqtt:acurite');
  * @param res - Server Response
  */
 async function handleAcuriteRequest(req: Request, res: Response): Promise<void>  {
-  acuriteLog(`Received data from station ${req.query.id} for sensor ${req.query.sensor} which is a ${req.query.mt}`);
+  expressLog(`Received data from station ${req.query.id} for sensor ${req.query.sensor} which is a ${req.query.mt}`);
 
   if (req.query.id) {
     // This is a dirty hack, because I am feeling lazy
     const towerQuery = req.query as unknown as IAcuriteTowerQuery;
-
     const towerData = translate(towerQuery);
+
+    logAcuriteRequest(towerData);
 
     await dataReportingService.addSensorReading(towerData);
   }
@@ -34,6 +36,6 @@ async function handleAcuriteRequest(req: Request, res: Response): Promise<void> 
 }
 
 
-router.get('/weatherstation/updateweatherstation', asyncHandler(handleAcuriteRequest));
+acuriteRouter.get('/weatherstation/updateweatherstation', asyncHandler(handleAcuriteRequest));
 
-export default router;
+export default acuriteRouter;
