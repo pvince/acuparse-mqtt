@@ -1,11 +1,11 @@
 import { IAcuriteData } from '../../acuparse/acurite.types';
 import { ISensorConfig, MultiValueSensor } from './sensors';
-import { IAcuriteTowerType } from '../../@types/acurite';
 import { SensorTower } from './sensorTower';
 import { SensorProIn } from './sensorProIn';
 import { Sensor5n1x31, Sensor5n1x38 } from './sensor5n1';
 import { getAcuparse } from '../../acuparse/acuparseClient';
 import { decode } from 'html-entities';
+import { IAcuriteTowerType } from '../../@types/acurite/acurite';
 
 /**
  * Determines what name a sensor (aka device) should be given.

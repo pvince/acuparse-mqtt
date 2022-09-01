@@ -1,4 +1,4 @@
-import { IAcurite5in1x31Data, IAcurite5in1x38Data } from '../../acuparse/acurite.types';
+import { IAcurite5in1x31, IAcurite5in1x38 } from '../../acuparse/acurite.types';
 import { SensorTower } from './sensorTower';
 import { SensorValueWindSpeed } from '../sensorValues/sensorValueWindSpeed';
 import { ISensorConfig, MultiValueSensor } from './sensors';
@@ -18,7 +18,7 @@ export class Sensor5n1x38 extends SensorTower {
    * @param towerData - Acurite // Acuparse tower data.
    * @param config - Sensor configuration information.
    */
-  public constructor(towerData: IAcurite5in1x38Data, config: ISensorConfig) {
+  public constructor(towerData: IAcurite5in1x38, config: ISensorConfig) {
     super(towerData, config);
 
     this.addSensorValue(new SensorValueWindSpeed(towerData));
@@ -42,7 +42,7 @@ export class Sensor5n1x31 extends MultiValueSensor {
    * @param towerData - Acurite // Acuparse tower data.
    * @param config - Sensor configuration information.
    */
-  public constructor(protected readonly towerData: IAcurite5in1x31Data, config: ISensorConfig) {
+  public constructor(protected readonly towerData: IAcurite5in1x31, config: ISensorConfig) {
     super(config);
 
     this.addSensorValue(new SensorValueWindSpeed(this.towerData));

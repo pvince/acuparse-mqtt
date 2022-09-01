@@ -1,4 +1,4 @@
-import { IAcuriteProInData } from '../../acuparse/acurite.types';
+import { IAcuriteProIn } from '../../acuparse/acurite.types';
 import {
   BinarySensorState,
   DeviceClass_BinarySensor,
@@ -17,7 +17,7 @@ export class SensorValueWater extends SensorValue {
    *
    * @param towerData - Tower data
    */
-  public constructor(private readonly towerData: IAcuriteProInData) {
+  public constructor(private readonly towerData: IAcuriteProIn) {
     super();
   }
 

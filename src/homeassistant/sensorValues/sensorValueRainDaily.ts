@@ -1,4 +1,4 @@
-import { IAcurite5in1x31Data } from '../../acuparse/acurite.types';
+import { IAcurite5in1x31 } from '../../acuparse/acurite.types';
 import { IMQTTSensor, ISensorState, SensorType, StateClass } from '../../@types/homeassistant';
 import { SensorValue } from './sensorValues';
 
@@ -11,7 +11,7 @@ export class SensorValueRainDaily extends SensorValue {
    *
    * @param towerData - Tower data
    */
-  public constructor(private readonly towerData: IAcurite5in1x31Data) {
+  public constructor(private readonly towerData: IAcurite5in1x31) {
     super();
   }
 

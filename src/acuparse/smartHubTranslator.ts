@@ -1,19 +1,20 @@
 import {
-  IAcurite5in1x31Query, IAcurite5in1x38Query,
-  IAcuriteBool,
-  IAcuriteDateUTC, IAcuriteProInQuery,
-  IAcuriteQueryBase,
-  IAcuriteRawQueryData,
-  IAcuriteTowerQuery,
-  IAcuriteTowerType
-} from '../@types/acurite';
+  ISmartHub5in1x31Query,
+  ISmartHub5in1x38Query,
+  ISmartHubProInQuery,
+  ISmartHubQueryBase,
+  IAcuriteSmartHubRawQueryData,
+  ISmartHubTowerQuery
+} from '../@types/acurite/smartHub';
 import {
+  IAcurite5in1x31,
+  IAcurite5in1x38,
+  IAcuriteBase,
   IAcuriteData,
-  IAcuriteBaseData,
-  IAcuriteTowerData,
-  IAcuriteProInData,
-  IAcurite5in1x31Data, IAcurite5in1x38Data
+  IAcuriteProIn,
+  IAcuriteTower
 } from './acurite.types';
+import { IAcuriteBool, IAcuriteDateUTC, IAcuriteTowerType } from '../@types/acurite/acurite';
 
 const _convertBool = (inBool: IAcuriteBool): boolean => inBool === IAcuriteBool.true;
 
@@ -23,7 +24,7 @@ const _convertBool = (inBool: IAcuriteBool): boolean => inBool === IAcuriteBool.
  * @param inData - Data to convert
  * @returns - Returns the parsed data.
  */
-export function translateBase(inData: IAcuriteQueryBase): IAcuriteBaseData {
+export function translateBase(inData: ISmartHubQueryBase): IAcuriteBase {
   let dateToUse: Date;
 
   switch (inData.dateutc) {
@@ -49,7 +50,7 @@ export function translateBase(inData: IAcuriteQueryBase): IAcuriteBaseData {
  * @param inData - Data to convert
  * @returns - Parsed data
  */
-export function translateTower(inData: IAcuriteTowerQuery): IAcuriteTowerData {
+export function translateTower(inData: ISmartHubTowerQuery): IAcuriteTower {
   const baseData = translateBase(inData);
 
   return {
@@ -66,7 +67,7 @@ export function translateTower(inData: IAcuriteTowerQuery): IAcuriteTowerData {
  * @param inData - Data to convert
  * @returns - Parsed data
  */
-export function translateProIn(inData: IAcuriteProInQuery): IAcuriteProInData {
+export function translateProIn(inData: ISmartHubProInQuery): IAcuriteProIn {
   const baseData = translateBase(inData);
 
   return {
@@ -86,7 +87,7 @@ export function translateProIn(inData: IAcuriteProInQuery): IAcuriteProInData {
  * @param inData - Data to convert
  * @returns - Parsed data
  */
-export function translate5in1x31(inData: IAcurite5in1x31Query): IAcurite5in1x31Data {
+export function translate5in1x31(inData: ISmartHub5in1x31Query): IAcurite5in1x31 {
   const baseData = translateBase(inData);
 
   return {
@@ -105,7 +106,7 @@ export function translate5in1x31(inData: IAcurite5in1x31Query): IAcurite5in1x31D
  * @param inData - Data to convert
  * @returns - Parsed data
  */
-export function translate5in1x38(inData: IAcurite5in1x38Query): IAcurite5in1x38Data {
+export function translate5in1x38(inData: ISmartHub5in1x38Query): IAcurite5in1x38 {
   const baseData = translateBase(inData);
 
   return {
@@ -123,7 +124,7 @@ export function translate5in1x38(inData: IAcurite5in1x38Query): IAcurite5in1x38D
  * @param inData - Data to convert
  * @returns - Parsed data
  */
-export function translate(inData: IAcuriteRawQueryData): IAcuriteData {
+export function translateSmartHub(inData: IAcuriteSmartHubRawQueryData): IAcuriteData {
   let resultData: IAcuriteData;
 
   switch (inData.mt) {

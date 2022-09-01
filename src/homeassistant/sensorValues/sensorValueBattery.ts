@@ -1,7 +1,7 @@
 import { SensorValue } from './sensorValues';
 import { IAcuriteData } from '../../acuparse/acurite.types';
 import { DeviceClass_Sensor, IMQTTSensor, ISensorState, SensorType } from '../../@types/homeassistant';
-import { IAcuriteBatteryLevel } from '../../@types/acurite';
+import { IAcuriteBatteryLevel } from '../../@types/acurite/acurite';
 
 /**
  * Implements a sensor value for a humidity sensor.

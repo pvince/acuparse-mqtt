@@ -1,4 +1,4 @@
-import { IAcuriteProInData } from '../../acuparse/acurite.types';
+import { IAcuriteProIn } from '../../acuparse/acurite.types';
 import { SensorTower } from './sensorTower';
 import { SensorValueWater } from '../sensorValues/sensorValueWater';
 import { ISensorConfig } from './sensors';
@@ -13,7 +13,7 @@ export class SensorProIn extends SensorTower {
    * @param towerData - Acurite // Acuparse tower data.
    * @param config - Sensor configuration information.
    */
-  public constructor(towerData: IAcuriteProInData, config: ISensorConfig) {
+  public constructor(towerData: IAcuriteProIn, config: ISensorConfig) {
     super(towerData, config);
 
     this.addSensorValue(new SensorValueWater(towerData));

@@ -1,16 +1,12 @@
 /**
  * @file This file has more Javascript appropriate interpretations of the raw Acurite query data.
  */
-import {
-  IAcuriteBatteryLevel,
-  IAcuriteProInProbeType,
-  IAcuriteTowerType
-} from '../@types/acurite';
+import { IAcuriteBatteryLevel, IAcuriteProInProbeType, IAcuriteTowerType } from '../@types/acurite/acurite';
 
 /**
  * Base Acurite data that has had text converted to numbers
  */
-export interface IAcuriteBaseData {
+export interface IAcuriteBase {
   /**
    * Date & Time that the acuparse-mqtt received this data.
    */
@@ -50,7 +46,7 @@ export interface IAcuriteBaseData {
 /**
  * Standard 'tower' sensor that just reports temperature & humidity.
  */
-export interface IAcuriteTowerData extends IAcuriteBaseData {
+export interface IAcuriteTower extends IAcuriteBase {
   /**
    * Type discriminator
    */
@@ -71,7 +67,7 @@ export interface IAcuriteTowerData extends IAcuriteBaseData {
  * Fancy indoor sensor, 'ProIn' with water sensor installed. There are at least two other sensor probes that were sold
  * but since I don't have them I cannot identify them.
  */
-export interface IAcuriteProInData extends Omit<IAcuriteTowerData, 'mt'>   {
+export interface IAcuriteProIn extends Omit<IAcuriteTower, 'mt'>   {
   /**
    * Type discriminator
    */
@@ -97,7 +93,7 @@ export interface IAcuriteProInData extends Omit<IAcuriteTowerData, 'mt'>   {
  * The 5-in-1 sensor sends its data with two separate data packets. This is the data package
  * that contains rain information.
  */
-export interface IAcurite5in1x31Data  extends IAcuriteBaseData {
+export interface IAcurite5in1x31 extends IAcuriteBase {
   /**
    * Type discriminator
    */
@@ -128,7 +124,7 @@ export interface IAcurite5in1x31Data  extends IAcuriteBaseData {
  * The 5-in-1 sensor sends its data with two separate data packets. This is the data package
  * that contains temperature // humidity information.
  */
-export interface IAcurite5in1x38Data extends Omit<IAcuriteTowerData, 'mt'> {
+export interface IAcurite5in1x38 extends Omit<IAcuriteTower, 'mt'> {
   /**
    * Type discriminator
    */
@@ -143,14 +139,14 @@ export interface IAcurite5in1x38Data extends Omit<IAcuriteTowerData, 'mt'> {
 /**
  * Union of the various data types that supply temperature & humidity data.
  */
-export type IAcuriteDataWithTemperature = IAcurite5in1x38Data | IAcuriteProInData | IAcuriteTowerData;
+export type IAcuriteDataWithTemperature = IAcurite5in1x38 | IAcuriteProIn | IAcuriteTower;
 
 /**
  * Union of the various data types that supply wind speed information.
  */
-export type IAcuriteDataWithWind = IAcurite5in1x31Data | IAcurite5in1x38Data;
+export type IAcuriteDataWithWind = IAcurite5in1x31 | IAcurite5in1x38;
 
 /**
  * Union of the various data types we can expect to receive from Acuparse.
  */
-export type IAcuriteData = IAcurite5in1x31Data | IAcurite5in1x38Data | IAcuriteProInData | IAcuriteTowerData;
+export type IAcuriteData = IAcurite5in1x31 | IAcurite5in1x38 | IAcuriteProIn | IAcuriteTower;

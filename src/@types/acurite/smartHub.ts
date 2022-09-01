@@ -1,56 +1,16 @@
-/**
- * Different types of known Acurite towers & the data they may provide.
- */
-export enum IAcuriteTowerType  {
-  tower = 'tower',
-  FiveInOneX31 = '5N1x31',
-  FiveInOneX38 = '5N1x38',
-  ProIn = 'ProIn'
-
-}
-
-/**
- * Possible values for the Acurite Date UTC field
- */
-export enum IAcuriteDateUTC {
-  now = 'now'
-}
-
-/**
- * Possible values for the acurite action type
- */
-export enum IAcuriteActionType {
-  updateraw = 'updateraw'
-}
-
-/**
- * Acurite uses 0 // 1 for true & false.
- */
-export enum IAcuriteBool {
-  false = '0',
-  true = '1'
-}
-
-/**
- * Possible values for the acurite battery level.
- */
-export enum IAcuriteBatteryLevel {
-  low = 'low',
-  normal = 'normal'
-}
-
-/**
- * Type of probe installed in the indoor sensor.
- */
-export enum IAcuriteProInProbeType {
-  none = '0',
-  water = '1'
-}
+import {
+  IAcuriteActionType,
+  IAcuriteBatteryLevel,
+  IAcuriteBool,
+  IAcuriteDateUTC,
+  IAcuriteProInProbeType,
+  IAcuriteTowerType
+} from './acurite';
 
 /**
  * Common fields to all acurite queries.
  */
-export interface IAcuriteQueryBase {
+export interface ISmartHubQueryBase {
   /**
    * Always 'now'
    */
@@ -95,7 +55,7 @@ export interface IAcuriteQueryBase {
 /**
  * Standard 'tower' sensor that just reports temperature & humidity.
  */
-export interface IAcuriteTowerQuery extends IAcuriteQueryBase {
+export interface ISmartHubTowerQuery extends ISmartHubQueryBase {
   /**
    * Type discriminator
    */
@@ -116,7 +76,7 @@ export interface IAcuriteTowerQuery extends IAcuriteQueryBase {
  * Fancy indoor sensor, 'ProIn' with water sensor installed. There are at least two other sensor probes that were sold
  * but since I don't have them I cannot identify them.
  */
-export interface IAcuriteProInQuery extends IAcuriteQueryBase  {
+export interface ISmartHubProInQuery extends ISmartHubQueryBase  {
   /**
    * Type discriminator
    */
@@ -152,7 +112,7 @@ export interface IAcuriteProInQuery extends IAcuriteQueryBase  {
  * The 5-in-1 sensor sends its data with two separate data packets. This is the data package
  * that contains rain information.
  */
-export interface IAcurite5in1x31Query  extends IAcuriteQueryBase {
+export interface ISmartHub5in1x31Query extends ISmartHubQueryBase {
   /**
    * Type discriminator
    */
@@ -183,7 +143,7 @@ export interface IAcurite5in1x31Query  extends IAcuriteQueryBase {
  * The 5-in-1 sensor sends its data with two separate data packets. This is the data package
  * that contains temperature // humidity information.
  */
-export interface IAcurite5in1x38Query extends Omit<IAcuriteTowerQuery, 'mt'> {
+export interface ISmartHub5in1x38Query extends Omit<ISmartHubTowerQuery, 'mt'> {
   /**
    * Type discriminator
    */
@@ -198,4 +158,4 @@ export interface IAcurite5in1x38Query extends Omit<IAcuriteTowerQuery, 'mt'> {
 /**
  * Union of the various data types we can expect to receive from Acuparse.
  */
-export type IAcuriteRawQueryData = IAcurite5in1x31Query | IAcurite5in1x38Query | IAcuriteProInQuery | IAcuriteTowerQuery;
+export type IAcuriteSmartHubRawQueryData = ISmartHub5in1x31Query | ISmartHub5in1x38Query | ISmartHubProInQuery | ISmartHubTowerQuery;
