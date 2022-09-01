@@ -79,6 +79,12 @@ export class AcuparseClient {
    * @returns - The requested tower, or null if it doesn't exist on the Acuparse server.
    */
   public async getTower(towerID: string): Promise<IAcuparseTower | null> {
+    //todo: Two possibly improvements I see in this area:
+    //      1. If we fail to lookup a tower, we should probably stop trying to look it up. Acuparse is incredibly slow
+    //         to respond  (~13 seconds is common).
+    //      2. We should look into updating the callers to this function to stop them from reporting the data for a sensor
+    //         we can't identify.
+
     // There is a possibility of multiple simultaneous calls to this function. Due to the oddities of Javascript
     // event loop, it is possible that when we start retrieving the towers a 2nd call could enter the 'update' region.
     // This would leave us with two, simultaneous, attempts to retrieve tower data when we might not want that.

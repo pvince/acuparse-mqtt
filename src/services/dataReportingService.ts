@@ -116,7 +116,10 @@ class DataReportingService {
    */
   protected async checkPublishedConfig(sensorID: string, sensorConfig: [string, IMQTTSensor][]): Promise<boolean> {
     const fullConfiguration = sensorConfig;
-    
+
+    //todo: It is probably worth considering alternatives to this, or creating the mutex on a per-sensor basis.
+    //      as it stands now, checking ANY sensor's configuration blocks ALL sensors from checking their configuration.
+    //      this doesn't have to be the case.
     const release = await this.configMutex.acquire();
 
     let result: boolean;
