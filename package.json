@@ -1,11 +1,11 @@
 {
   "name": "acuparse-mqtt",
   "version": "1.0.0",
-  "description": "Relays acuparse messages to an MQTT broker",
+  "description": "Relays Acurite data to an MQTT broker",
   "main": "dist/app.js",
   "scripts": {
     "build": "tsc",
-    "start": "ts-node src/app.ts"
+    "start": "node --tls-min-v1.0 -r ts-node/register src/app.ts"
   },
   "keywords": [
     "acuparse",
@@ -23,6 +23,7 @@
     "@types/fs-extra": "^9.0.13",
     "@types/lodash": "^4.14.184",
     "@types/node": "^16.11.49",
+    "@types/selfsigned": "^2.0.1",
     "@typescript-eslint/eslint-plugin": "^5.33.1",
     "@typescript-eslint/parser": "^5.33.1",
     "eslint": "^8.22.0",
@@ -44,6 +45,7 @@
     "html-entities": "^2.3.3",
     "http-status": "^1.5.2",
     "lodash": "^4.17.21",
+    "selfsigned": "^2.0.1",
     "toad-scheduler": "^1.6.1"
   }
 }

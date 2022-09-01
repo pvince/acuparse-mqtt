@@ -1,11 +1,14 @@
 import 'dotenv/config';
-import express, { NextFunction, Request, Response } from 'express';
+import express, { Express, NextFunction, Request, Response } from 'express';
 import debug from 'debug';
 import * as mqttComms from './mqtt/mqttComms';
 import acuriteRouter from './routes/acurite';
 import { setupAcuparse } from './acuparse/acuparseClient';
 import apiRouter from './routes/api';
 import compression from 'compression';
+import { getSSLInfo } from './services/certificateManager';
+import * as http from 'http';
+import * as https from 'https';
 
 const appLog = debug('acuparse-mqtt');
 
@@ -16,9 +19,11 @@ const ACUPARSE_HOST = process.env.ACUPARSE_HOST ?? 'MISSING HOST';
 
 /**
  * Starts the express server that listens for data input.
+ *
+ * @returns - Express application
  */
-function startExpress(): void {
-  appLog('Starting web service...');
+function initializeExpress(): Express {
+  appLog('Initializing web service...');
   const app = express();
 
   app.use(compression());
@@ -34,9 +39,26 @@ function startExpress(): void {
     appLog(JSON.stringify(err));
   });
 
-  const PORT = 80;
-  app.listen(PORT, () => {
-    appLog('Started listening on port %d', PORT);
+  return app;
+}
+
+/**
+ * Start the HTTP & HTTPS servers.
+ *
+ * @param app - Express app
+ */
+async function startHTTP(app: Express): Promise<void> {
+  const options = await getSSLInfo();
+
+  const HTTP_PORT = 80;
+  const HTTPS_PORT = 443;
+
+  http.createServer(app).listen(HTTP_PORT, () => {
+    appLog('Started listening for HTTP requests on port %d', HTTP_PORT);
+  });
+
+  https.createServer(options, app).listen(HTTPS_PORT, () => {
+    appLog('Started listening for HTTPS requests on port %d', HTTPS_PORT);
   });
 }
 
@@ -61,7 +83,8 @@ async function startup(): Promise<void> {
   await setupAcuparseClient();
   await startMQTT();
 
-  startExpress();
+  const app = initializeExpress();
+  await startHTTP(app);
 }
 
 startup()
