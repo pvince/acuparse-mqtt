@@ -1,9 +1,10 @@
 import 'dotenv/config';
-import Ajv from 'ajv';
+import Ajv, { ValidateFunction } from 'ajv';
 import fs from 'fs-extra';
 import path from 'path';
 import debug from 'debug';
 import _ from 'lodash';
+import chokidar, { FSWatcher } from 'chokidar';
 
 const configLog = debug('acuparse-mqtt:config');
 const UNSET = '<unset>';
@@ -40,14 +41,21 @@ const CONFIG_NAME = 'configuration.json';
 const DEFAULT_CONFIG: IConfigurationJson = { sensors: {} };
 Object.freeze(DEFAULT_CONFIG);
 
+const ajv = new Ajv();
+let ajvValidate: ValidateFunction | null = null;
+
 /**
- * Loads the schema file.
+ * Loads the schema file & compiles the validator.
  *
- * @returns - JSON Schema file that can validate the configuration.
+ * @returns - Schema validation function.
  */
-function loadSchema(): Promise<object> {
-  configLog('Loading configuration schema...');
-  return fs.readJson(SCHEMA_PATH);
+async function getValidator(): Promise<ValidateFunction> {
+  if (ajvValidate === null) {
+    configLog('Loading configuration schema...');
+    const schema = await fs.readJson(SCHEMA_PATH);
+    ajvValidate = ajv.compile(schema);
+  }
+  return ajvValidate;
 }
 
 /**
@@ -81,11 +89,7 @@ async function loadRawConfigFile(): Promise<unknown> {
 async function loadConfiguration(): Promise<IConfigurationJson> {
   configLog('Loading configuration...');
   const possibleConfig = await loadRawConfigFile();
-  const schema = await loadSchema();
-
-  //todo: We are going to want to reuse this validator, and it shouldn't change while the application is running.
-  const ajv = new Ajv();
-  const validate = ajv.compile(schema);
+  const validate = await getValidator();
   const valid = validate(possibleConfig);
 
   let result: IConfigurationJson;
@@ -104,7 +108,19 @@ async function loadConfiguration(): Promise<IConfigurationJson> {
  * Configuration class for the process
  */
 class Configuration {
+  /**
+   * Locally stored configuration data loaded from disk.
+   *
+   * @protected
+   */
   protected configuration: IConfigurationJson | null = null;
+
+  /**
+   * Filesystem watcher that monitors the config file.
+   *
+   * @protected
+   */
+  protected watcher: FSWatcher | null = null;
 
   /**
    * Returns the configured sensors.
@@ -113,6 +129,26 @@ class Configuration {
    */
   public get sensors(): ISensors | null {
     return this.configuration?.sensors ?? null;
+  }
+
+  /**
+   * Retrieve the sensor configuration object.
+   *
+   * @param sensorID - Sensor ID (this is the raw sensor ID, eg: 0000234)
+   * @returns - The sensor configuration, or null if no sensor config is found.
+   */
+  public getSensorConfig(sensorID: string): IKnownSensor | null {
+    return this.sensors?.[sensorID] ?? null;
+  }
+
+  /**
+   * Retrieves the sensors configured 'friendly' name.
+   *
+   * @param sensorID - ID of the sensor. (This is the raw sensor ID, eg:  0000234)
+   * @returns - The sensor's friendly name, or null if no sensor config is found.
+   */
+  public getSensorFriendlyName(sensorID: string): string | null {
+    return this.getSensorConfig(sensorID)?.sensorName ?? null;
   }
 
   /**
@@ -170,10 +206,32 @@ class Configuration {
    * Initializes the configuration object. This should be called on startup.
    */
   public async initialize(): Promise<void> {
-    this.configuration = await loadConfiguration();
+    await this.loadConfiguration();
 
-    //todo: Start watching the configuration for changes & reload it.
-    //todo: Add a 'shutdown' method to stop watching the configuration.
+    if (this.watcher === null) {
+      this.watcher = chokidar.watch(CONFIG_NAME, { ignoreInitial: true });
+
+      this.watcher.on('add', () => this.loadConfiguration() )
+        .on('change', () => this.loadConfiguration());
+    }
+  }
+
+  /**
+   * Should be called when the process is shutdown to ensure the watcher is stopped.
+   */
+  public async shutdown(): Promise<void> {
+    if (this.watcher !== null) {
+      await this.watcher.close();
+    }
+  }
+
+  /**
+   * Reload the configuration file w/ changes from disk.
+   *
+   * @protected
+   */
+  protected async loadConfiguration(): Promise<void> {
+    this.configuration = await loadConfiguration();
   }
 }
 
