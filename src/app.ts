@@ -75,13 +75,21 @@ async function setupAcuparseClient(): Promise<void> {
 }
 
 /**
- * Starts the application.
+ * Ensures the configuration is initialized.
  */
-async function startup(): Promise<void> {
+async function loadConfiguration(): Promise<void> {
+  await configuration.initialize();
+
   if (configuration.isDebug()) {
     appLog('Running in development mode!');
   }
+}
 
+/**
+ * Starts the application.
+ */
+async function startup(): Promise<void> {
+  await loadConfiguration();
   await setupAcuparseClient();
   await startMQTT();
 

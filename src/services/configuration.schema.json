@@ -1,0 +1,37 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "definitions": {
+        "IKnownSensor": {
+            "description": "Sensor configuration",
+            "properties": {
+                "sensorName": {
+                    "description": "Sensor name to use.",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "sensorName"
+            ],
+            "type": "object"
+        },
+        "ISensors": {
+            "additionalProperties": {
+                "$ref": "#/definitions/IKnownSensor"
+            },
+            "description": "Map of SensorID => Sensor Configuration",
+            "type": "object"
+        }
+    },
+    "description": "Configuration file structure",
+    "properties": {
+        "sensors": {
+            "$ref": "#/definitions/ISensors",
+            "description": "Map of SensorID => Sensor configuration"
+        }
+    },
+    "required": [
+        "sensors"
+    ],
+    "type": "object"
+}
+

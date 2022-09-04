@@ -11,6 +11,7 @@
   - [ ] Add a basic 'statistics' view
 - [ ] Add proper error logging for diagnosing unexpected problems.
 - [ ] Remove Acuparse dependency, and allow this to directly aggregate sensor data.
+  - [*] Setup a forwarder to directly forward raw SmartHub & Access data.
   - Benefits of doing this include
     - Allow multiple smart-hubs to report their data directly to this
     - Could switch Acuparse to pulling in data from my 'Access' hub, which has a more reliable connection w/ my 5-in-1 
