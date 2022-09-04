@@ -1,10 +1,14 @@
 import { initializeSensorState, SensorValue } from '../sensorValues/sensorValues';
 import { IMQTTSensor, ISensorState } from '../../@types/homeassistant';
+import configuration from '../../services/configuration';
 
-const TOPIC_PREFIX = 'homeassistant';
-const getSensorTopicRoot = (sensorID: string, sensorValue: SensorValue): string => (`${TOPIC_PREFIX}/${sensorValue.getSensorType()}/${sensorID}`);
-const getSensorTopicConfig = (sensorID: string, sensorValue:  SensorValue): string => (`${getSensorTopicRoot(sensorID, sensorValue)}/${sensorValue.getConfigurationTopicName()}/config`);
-const getSensorTopicState = (sensorID: string, sensorValue: SensorValue): string => (`${getSensorTopicRoot(sensorID, sensorValue)}/state`);
+const ROOT_TOPIC_DEBUG = 'homeassistant_debug';
+const ROOT_TOPIC_RELEASE = 'homeassistant';
+const ROOT_TOPIC = configuration.isDebug() ? ROOT_TOPIC_DEBUG : ROOT_TOPIC_RELEASE;
+
+const getSensorTopicCommon = (sensorID: string, sensorValue: SensorValue): string => (`${ROOT_TOPIC}/${sensorValue.getSensorType()}/${sensorID}`);
+const getSensorTopicConfig = (sensorID: string, sensorValue:  SensorValue): string => (`${getSensorTopicCommon(sensorID, sensorValue)}/${sensorValue.getConfigurationTopicName()}/config`);
+const getSensorTopicState = (sensorID: string, sensorValue: SensorValue): string => (`${getSensorTopicCommon(sensorID, sensorValue)}/state`);
 
 /**
  * Sensor configuration

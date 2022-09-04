@@ -1,4 +1,3 @@
-import 'dotenv/config';
 import express, { Express, NextFunction, Request, Response } from 'express';
 import debug from 'debug';
 import * as mqttComms from './mqtt/mqttComms';
@@ -9,13 +8,9 @@ import compression from 'compression';
 import { getSSLInfo } from './services/certificateManager';
 import * as http from 'http';
 import * as https from 'https';
+import configuration from './services/configuration';
 
 const appLog = debug('acuparse-mqtt');
-
-const MQTT_HOST = process.env.MQTT_HOST ?? 'MISSING HOST';
-const MQTT_USER = process.env.MQTT_USER ?? 'MISSING USERNAME';
-const MQTT_PASS = process.env.MQTT_PASS ?? 'MISSING PASSWORD';
-const ACUPARSE_HOST = process.env.ACUPARSE_HOST ?? 'MISSING HOST';
 
 /**
  * Starts the express server that listens for data input.
@@ -50,7 +45,7 @@ function initializeExpress(): Express {
 async function startHTTP(app: Express): Promise<void> {
   const options = await getSSLInfo();
 
-  const HTTP_PORT = 80;
+  const HTTP_PORT = 2999;
   const HTTPS_PORT = 443;
 
   http.createServer(app).listen(HTTP_PORT, () => {
@@ -66,20 +61,27 @@ async function startHTTP(app: Express): Promise<void> {
  * Starts the MQTT client
  */
 async function startMQTT(): Promise<void> {
-  await mqttComms.startClient(MQTT_HOST, { username: MQTT_USER, password: MQTT_PASS });
+  await mqttComms.startClient(configuration.mqttHost, {
+    username: configuration.mqttUser,
+    password: configuration.mqttPass
+  });
 }
 
 /**
  * Set up the acuparse client.
  */
 async function setupAcuparseClient(): Promise<void> {
-  setupAcuparse(ACUPARSE_HOST);
+  setupAcuparse(configuration.acuparseHost);
 }
 
 /**
  * Starts the application.
  */
 async function startup(): Promise<void> {
+  if (configuration.isDebug()) {
+    appLog('Running in development mode!');
+  }
+
   await setupAcuparseClient();
   await startMQTT();
 
