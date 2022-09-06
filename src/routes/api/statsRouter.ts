@@ -10,7 +10,7 @@ import { statCounters } from '../../services/statistics';
 function handleStatusRequest(req: Request, res: Response): void  {
   // Reply w/ a 200 - OK
   res.json(statCounters);
-  res.end();
+  res.send();
 }
 
 const statsRouter = Router();

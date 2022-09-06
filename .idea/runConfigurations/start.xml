@@ -7,7 +7,7 @@
     </scripts>
     <node-interpreter value="project" />
     <envs>
-      <env name="DEBUG" value="acuparse-mqtt:config*" />
+      <env name="DEBUG" value="acuparse-mqtt*" />
     </envs>
     <method v="2" />
   </configuration>

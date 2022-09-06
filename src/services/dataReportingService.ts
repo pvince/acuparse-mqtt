@@ -32,14 +32,17 @@ function sleepPromise(duration: number): Promise<void> {
  */
 class DataReportingService {
   /**
-   * Stores sensors that need to be reported to the MQTT broker.
+   * Stores sensor readings that need to be reported to the MQTT broker. Sensors are removed from here once their data
+   * is reported.
    *
    * @private
    */
-  private readonly dataStore = new Map<string, MultiValueSensor>();
+  private readonly activeSensors = new Map<string, MultiValueSensor>();
+
+  private readonly latestReadings = new Map<string, MultiValueSensor>();
 
   /**
-   * Stores the sensor specific periodic reporting jobs.
+   * Stores the sensor specific periodic reporting jobs. These are started // stopped as needed.
    *
    * @private
    */
@@ -53,6 +56,14 @@ class DataReportingService {
    */
   private readonly sentConfigs = new Set<string>;
 
+  //todo: We could improve the throughput of this to have a per-sensorID mutex to truly limit this to only 1 specific
+  //      sensor performing the action at the same time.
+  /**
+   * As configurations are retrieved from the MQTT server we can't allow two identical sensors to retrieve configs at the
+   * same time. This ensures that only a single config is active at time.
+   *
+   * @private
+   */
   private readonly configMutex = new Mutex();
 
   /**
@@ -68,10 +79,20 @@ class DataReportingService {
     // Publish the sensor configuration
     await this.publishSensorConfig(sensor);
 
-    this.dataStore.set(sensor.getSensorID(), sensor);
+    this.activeSensors.set(sensor.getSensorID(), sensor);
+    this.latestReadings.set(sensor.getSensorID(), sensor);
 
     // Ensure the job is running.
     this.startJob(sensor.getSensorID());
+  }
+
+  /**
+   * Retrieves the most recent sensor readings.
+   * 
+   * @returns - Map of <sensorID, Sensor>
+   */
+  public getLatestReadings(): Map<string,  MultiValueSensor> {
+    return this.latestReadings;
   }
 
   /**
@@ -162,10 +183,8 @@ class DataReportingService {
       if (result) {
         for (const [topic, config] of fullConfiguration) {
           const publishedConfig = receivedFullConfiguration.get(topic);
-          if (publishedConfig === undefined) {
-            result = false;
-            break;
-          } else if (!_.isEqual(config, publishedConfig)) {
+          if (publishedConfig === undefined ||
+              !_.isEqual(config, publishedConfig)) {
             result = false;
             break;
           }
@@ -196,7 +215,7 @@ class DataReportingService {
    */
   protected async publishSensorStates(sensorID: string): Promise<void> {
     try {
-      const sensor = this.dataStore.get(sensorID);
+      const sensor = this.activeSensors.get(sensorID);
       if (!sensor) {
         submitLog('Finished reporting for sensor ID %s, stopping the job', sensorID);
         this.jobStore.get(sensorID)?.stop();
@@ -213,7 +232,7 @@ class DataReportingService {
         }
 
         // Finally, pause this job since we just sent the data.
-        this.dataStore.delete(sensorID);
+        this.activeSensors.delete(sensorID);
       }
     } catch (err) {
       submitLog('Encountered an error publishing for %s: %s', sensorID, err);

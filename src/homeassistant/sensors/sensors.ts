@@ -21,6 +21,13 @@ export interface ISensorConfig {
 }
 
 /**
+ * Basic dictionary structure
+ */
+export interface ISerializationObject {
+  [key: string]: unknown;
+}
+
+/**
  * A sensor that has multiple values.
  */
 export abstract class MultiValueSensor {
@@ -115,7 +122,36 @@ export abstract class MultiValueSensor {
   }
 
   /**
+   * Serializes the sensor to JSON
+   *
+   * @returns - JSON data that represents a sensor
+   */
+  public toJSON(): ISerializationObject {
+    const result: ISerializationObject = {
+      sensorName: this.sensorName
+    };
+
+    this.populateSerializationObject(result);
+
+    return result;
+
+  }
+
+  /**
    * Unique sensor identifier. This is just used for grouping the data in the MQTT broker.
    */
   public abstract getSensorID(): string;
+
+  /**
+   * Another sensor unique identifier, but without any helpful text.
+   */
+  public abstract getShortSensorID(): string;
+
+  /**
+   * Allows subclasses to serialize custom data to the sensor object.
+   *
+   * @param inDestObj - Destination serialization object to populate.
+   * @protected
+   */
+  protected abstract populateSerializationObject(inDestObj: ISerializationObject): void;
 }

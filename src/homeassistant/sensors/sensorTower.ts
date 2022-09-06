@@ -1,35 +1,25 @@
 import { IAcuriteDataWithTemperature } from '../../acuparse/acurite.types';
-import { ISensorConfig, MultiValueSensor } from './sensors';
+import { ISensorConfig } from './sensors';
 import { SensorValueTemperature } from '../sensorValues/sensorValueTemperature';
 import { SensorValueHumidity } from '../sensorValues/sensorValueHumidity';
-import { SensorValueBattery } from '../sensorValues/sensorValueBattery';
-import { SensorValueSignal } from '../sensorValues/sensorValueSignal';
+import { SensorAcurite } from './sensorAcurite';
 
 /**
  * A Home Assistant sensor definition for an Acurite 'tower' sensor.
  */
-export class SensorTower extends MultiValueSensor {
+export class SensorTower extends SensorAcurite {
   /**
    * Constructor.
    *
    * @param towerData - Acurite // Acuparse tower data.
    * @param config - Sensor configuration information.
    */
-  public constructor(protected readonly towerData: IAcuriteDataWithTemperature, config: ISensorConfig) {
-    super(config);
+  public constructor(towerData: IAcuriteDataWithTemperature, config: ISensorConfig) {
+    super(towerData, config);
 
-    this.addSensorValue(new SensorValueTemperature(this.towerData));
-    this.addSensorValue(new SensorValueHumidity(this.towerData));
-    this.addSensorValue(new SensorValueBattery(this.towerData));
-    this.addSensorValue(new SensorValueSignal(this.towerData));
+    this.addSensorValue(new SensorValueTemperature(towerData));
+    this.addSensorValue(new SensorValueHumidity(towerData));
     // Disabling timestamp for now
     // this.addSensorValue(new SensorValueTimestamp(this.towerData));
-  }
-
-  /**
-   * @inheritDoc
-   */
-  public override getSensorID(): string {
-    return `${this.towerData.sensor}_${this.towerData.mt}`;
   }
 }

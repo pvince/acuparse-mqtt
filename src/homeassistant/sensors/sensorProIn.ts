@@ -1,12 +1,12 @@
 import { IAcuriteProIn } from '../../acuparse/acurite.types';
-import { SensorTower } from './sensorTower';
 import { SensorValueWater } from '../sensorValues/sensorValueWater';
 import { ISensorConfig } from './sensors';
+import { SensorAcurite } from './sensorAcurite';
 
 /**
  * A Home Assistant sensor definition for an Acurite 'tower' sensor.
  */
-export class SensorProIn extends SensorTower {
+export class SensorProIn extends SensorAcurite {
   /**
    * Constructor.
    *
@@ -17,12 +17,5 @@ export class SensorProIn extends SensorTower {
     super(towerData, config);
 
     this.addSensorValue(new SensorValueWater(towerData));
-  }
-
-  /**
-   * @inheritDoc
-   */
-  public override getSensorID(): string {
-    return `${this.towerData.sensor}_${this.towerData.mt}`;
   }
 }
