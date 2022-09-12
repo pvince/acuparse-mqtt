@@ -45,7 +45,7 @@
     "html-entities": "^2.3.3",
     "http-status": "^1.5.2",
     "lodash": "^4.17.21",
-    "selfsigned": "^2.0.1",
+    "selfsigned": "^2.1.1",
     "toad-scheduler": "^1.6.1"
   }
 }
